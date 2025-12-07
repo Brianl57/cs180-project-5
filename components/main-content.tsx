@@ -5,7 +5,7 @@ export function MainContent() {
   return (
     <main className="flex-1 py-12 px-8 lg:px-16 max-w-4xl">
       {/* Header */}
-      <header className="mb-12">
+      <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-4">Fun With Diffusion Models!</h1>
         <div className="text-sm text-muted-foreground mb-6">
           <p>
@@ -15,30 +15,131 @@ export function MainContent() {
             <span className="font-medium text-foreground">Published:</span> December 5, 2025
           </p>
         </div>
-        <TextPlaceholder lines={3} />
       </header>
 
       {/* Part 0: Setup */}
       <section id="part-0" className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Part 0: Setup</h2>
+        <p className="mb-8 text-muted-foreground">
+          This project explores diffusion models end-to-end: generating prompt embeddings, implementing the forward
+          noising process, classical and learned denoising, iterative sampling, classifier-free guidance, image-to-image
+          translation, inpainting, visual anagrams, and hybrid images. Each component was implemented and tested in
+          Colab using the DeepFloyd IF model. All experiments and results were produced using a fixed random seed (seed
+          = 100) for consistent reproducibility.
+        </p>
 
-        <div id="gaining-access" className="mb-8">
-          <h3 className="text-lg font-semibold mb-3">Gaining Access to DeepFloyd</h3>
-          <TextPlaceholder lines={2} />
-        </div>
+        <p className="mb-8 text-muted-foreground">
+          I created a diverse set of text prompts spanning photos, paintings, lithographs, and simple objects, 
+          then generated their corresponding prompt embeddings using the provided Hugging Face service. From this list, 
+          I selected three prompts—“an oil painting of a snowy mountain village,” “a photo of a dog,” and “a lithograph 
+          of waterfalls”—to explore how the diffusion model responds to different artistic styles and content types.
+        </p>
 
-        <div id="play-with-model" className="mb-8">
-          <h3 className="text-lg font-semibold mb-3">Play with the Model</h3>
-          <TextPlaceholder lines={2} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <ImagePlaceholder label="Sample Output 1" />
-            <ImagePlaceholder label="Sample Output 2" />
+        <p className="mb-8 text-muted-foreground">
+          The output quality strongly depended on the number of inference steps. At 5 steps, the model produced very coarse, 
+          grainy images with weak structure; in several cases—especially for the dog and waterfall prompts—the results were 
+          barely recognizable and did not clearly communicate the intended subject. Increasing to 20 steps significantly 
+          improved realism and prompt alignment, producing images with coherent shapes, textures, and lighting. At 50 steps, 
+          the model generated the most refined outputs, with sharper edges, more natural color transitions, and details that 
+          better matched each prompt. Both 20- and 50-step settings produced images that were clearly faithful to their 
+          corresponding prompts, though 50 steps consistently yielded more polished, high-quality results.
+        </p>
+
+        <div id="results" className="mb-8">
+          <h3 className="text-lg font-semibold mb-6">Results</h3>
+
+          {/* Prompt 1 */}
+          <div className="mb-8">
+            <h4 className="text-base font-medium mb-3">Prompt 1: an oil painting of a snowy mountain village</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/snowy-mountain-5.png"
+                  alt="Snowy Mountain Step 5"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 5</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/snowy-mountain-20.png"
+                  alt="Snowy Mountain Step 20"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 20</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/snowy-mountain-50.png"
+                  alt="Snowy Mountain Step 50"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 50</p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div id="deliverables-0" className="mb-8">
-          <h3 className="text-lg font-semibold mb-3">Deliverables</h3>
-          <TextPlaceholder lines={2} />
+          {/* Prompt 2 */}
+          <div className="mb-8">
+            <h4 className="text-base font-medium mb-3">Prompt 2: a photo of a dog</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/dog-5.png"
+                  alt="Dog Step 5"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 5</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/dog-20.png"
+                  alt="Dog Step 20"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 20</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/dog-50.png"
+                  alt="Dog Step 50"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 50</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Prompt 3 */}
+          <div className="mb-8">
+            <h4 className="text-base font-medium mb-3">Prompt 3: a lithograph of waterfalls</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/waterfall-5.png"
+                  alt="Waterfall Step 5"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 5</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/waterfall-20.png"
+                  alt="Waterfall Step 20"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 20</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/part_0/waterfall-50.png"
+                  alt="Waterfall Step 50"
+                  className="rounded-md w-full h-auto"
+                />
+                <p className="text-sm text-muted-foreground text-center">Inference Step: 50</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
