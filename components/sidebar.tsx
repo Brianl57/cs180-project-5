@@ -14,11 +14,7 @@ const navigation: NavSection[] = [
   {
     id: "part-0",
     title: "Part 0: Setup",
-    children: [
-      { id: "gaining-access", title: "Gaining Access to DeepFloyd" },
-      { id: "play-with-model", title: "Play with the Model" },
-      { id: "deliverables-0", title: "Deliverables" },
-    ],
+    // children: [], // Removed as per request
   },
   {
     id: "part-1",
@@ -34,13 +30,11 @@ const navigation: NavSection[] = [
         id: "image-to-image",
         title: "1.7 Image-to-Image Translation",
         children: [
-          { id: "sdedit", title: "SDEdit Results" },
-          { id: "editing-web", title: "Editing Web Images" },
-          { id: "editing-hand-drawn", title: "Editing Hand-Drawn Images" },
-          { id: "inpainting", title: "Inpainting" },
+          { id: "editing-hand-drawn-web", title: "1.7.1 Editing Hand-Drawn and Web Images" },
+          { id: "inpainting", title: "1.7.2 Inpainting" },
+          { id: "text-conditional", title: "1.7.3 Text-Conditional Image-to-Image" },
         ],
       },
-      { id: "text-conditional", title: "1.7.3 Text-Conditional Image-to-Image" },
       { id: "visual-anagrams", title: "1.8 Visual Anagrams" },
       { id: "hybrid-images", title: "1.9 Hybrid Images" },
     ],
@@ -56,8 +50,11 @@ function NavItem({
   item: NavChild
   depth?: number
 }) {
-  const [isOpen, setIsOpen] = useState(true)
   const hasChildren = item.children && item.children.length > 0
+  // For 1.7, we want to show children but not have toggle functionality
+  // The user requested: "Remove the drop down arrow functionaility... and just have it be linked"
+  // This implies we should always show children if they exist, and the parent should be a link.
+  const isExpanded = true
 
   return (
     <div>
@@ -65,24 +62,13 @@ function NavItem({
         href={`#${item.id}`}
         className={cn(
           "flex items-center gap-1 py-1 text-sm text-muted-foreground hover:text-foreground transition-colors",
-          // depth === 0 && "font-medium text-foreground",
           depth > 0 && "pl-4",
         )}
-        onClick={(e) => {
-          if (hasChildren) {
-            e.preventDefault()
-            setIsOpen(!isOpen)
-          }
-        }}
       >
-        {hasChildren && (
-          <span className="w-4 h-4 flex items-center justify-center">
-            {isOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-          </span>
-        )}
-        <span className={cn(!hasChildren && "pl-4")}>{item.title}</span>
+        {/* Removed arrow rendering logic as requested for 1.7 */}
+        <span className={cn("pl-4")}>{item.title}</span>
       </a>
-      {hasChildren && isOpen && (
+      {hasChildren && isExpanded && (
         <div className="ml-2">
           {item.children?.map((child: { id: string; title: string }) => (
             <a
@@ -116,19 +102,29 @@ export function Sidebar() {
         <nav className="space-y-2">
           {navigation.map((section) => (
             <div key={section.id}>
-              <button
-                onClick={() => toggleSection(section.id)}
-                className="flex items-center gap-1 w-full text-left py-1 font-medium text-sm hover:text-foreground transition-colors"
-              >
-                <span className="w-4 h-4 flex items-center justify-center">
-                  {openSections[section.id] ? (
-                    <ChevronDown className="w-3 h-3" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3" />
-                  )}
-                </span>
-                {section.title}
-              </button>
+              {section.children ? (
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  className="flex items-center gap-1 w-full text-left py-1 font-medium text-sm hover:text-foreground transition-colors"
+                >
+                  <span className="w-4 h-4 flex items-center justify-center">
+                    {openSections[section.id] ? (
+                      <ChevronDown className="w-3 h-3" />
+                    ) : (
+                      <ChevronRight className="w-3 h-3" />
+                    )}
+                  </span>
+                  {section.title}
+                </button>
+              ) : (
+                <a
+                  href={`#${section.id}`}
+                  className="flex items-center gap-1 w-full text-left py-1 font-medium text-sm hover:text-foreground transition-colors pl-5"
+                >
+                  {section.title}
+                </a>
+              )}
+
               {openSections[section.id] && section.children && (
                 <div className="ml-2 mt-1 space-y-0.5">
                   {section.children.map((child) => (
