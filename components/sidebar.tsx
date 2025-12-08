@@ -7,53 +7,68 @@ import { cn } from "@/lib/utils"
 interface NavSection {
   id: string
   title: string
-  children?: { id: string; title: string; children?: { id: string; title: string }[] }[]
+  children?: NavSection[]
 }
 
 const navigation: NavSection[] = [
   {
-    id: "part-0",
-    title: "Part 0: Setup",
-    // children: [], // Removed as per request
-  },
-  {
-    id: "part-1",
-    title: "Part 1: Sampling Loops",
+    id: "part-a",
+    title: "Part A: The Power of Diffusion Models!",
     children: [
-      { id: "forward-process", title: "1.1 Forward Process" },
-      { id: "classical-denoising", title: "1.2 Classical Denoising" },
-      { id: "one-step-denoising", title: "1.3 One-Step Denoising" },
-      { id: "iterative-denoising", title: "1.4 Iterative Denoising" },
-      { id: "diffusion-model-sampling", title: "1.5 Diffusion Model Sampling" },
-      { id: "cfg", title: "1.6 Classifier-Free Guidance (CFG)" },
       {
-        id: "image-to-image",
-        title: "1.7 Image-to-Image Translation",
+        id: "part-0",
+        title: "Part 0: Setup",
+        // children: [], 
+      },
+      {
+        id: "part-1",
+        title: "Part 1: Sampling Loops",
         children: [
-          { id: "editing-hand-drawn-web", title: "1.7.1 Editing Hand-Drawn and Web Images" },
-          { id: "inpainting", title: "1.7.2 Inpainting" },
-          { id: "text-conditional", title: "1.7.3 Text-Conditional Image-to-Image" },
+          { id: "forward-process", title: "1.1 Forward Process" },
+          { id: "classical-denoising", title: "1.2 Classical Denoising" },
+          { id: "one-step-denoising", title: "1.3 One-Step Denoising" },
+          { id: "iterative-denoising", title: "1.4 Iterative Denoising" },
+          { id: "diffusion-model-sampling", title: "1.5 Diffusion Model Sampling" },
+          { id: "cfg", title: "1.6 Classifier-Free Guidance (CFG)" },
+          {
+            id: "image-to-image",
+            title: "1.7 Image-to-Image Translation",
+            children: [
+              { id: "editing-hand-drawn-web", title: "1.7.1 Editing Hand-Drawn and Web Images" },
+              { id: "inpainting", title: "1.7.2 Inpainting" },
+              { id: "text-conditional", title: "1.7.3 Text-Conditional Image-to-Image" },
+            ],
+          },
+          { id: "visual-anagrams", title: "1.8 Visual Anagrams" },
+          { id: "hybrid-images", title: "1.9 Hybrid Images" },
         ],
       },
-      { id: "visual-anagrams", title: "1.8 Visual Anagrams" },
-      { id: "hybrid-images", title: "1.9 Hybrid Images" },
+    ],
+  },
+  {
+    id: "part-b",
+    title: "Part B: Flow Matching from Scratch!",
+    children: [
+      {
+        id: "part-b-1",
+        title: "Part 1: Training a Single-Step Denoising UNet",
+        children: [
+          { id: "implementing-unet", title: "1.1 Implementing the UNet" },
+          { id: "training-denoiser", title: "1.2 Using the UNet to Train a Denoiser" },
+        ],
+      },
     ],
   },
 ]
-
-type NavChild = NonNullable<NavSection["children"]>[number]
 
 function NavItem({
   item,
   depth = 0,
 }: {
-  item: NavChild
+  item: NavSection
   depth?: number
 }) {
   const hasChildren = item.children && item.children.length > 0
-  // For 1.7, we want to show children but not have toggle functionality
-  // The user requested: "Remove the drop down arrow functionaility... and just have it be linked"
-  // This implies we should always show children if they exist, and the parent should be a link.
   const isExpanded = true
 
   return (
@@ -63,21 +78,16 @@ function NavItem({
         className={cn(
           "flex items-center gap-1 py-1 text-sm text-muted-foreground hover:text-foreground transition-colors",
           depth > 0 && "pl-4",
+          // Add extra padding/style for what effectively become Section Headers (Part 0, Part 1)
+          depth === 0 && "font-medium text-foreground mt-2 mb-1"
         )}
       >
-        {/* Removed arrow rendering logic as requested for 1.7 */}
         <span className={cn("pl-4")}>{item.title}</span>
       </a>
       {hasChildren && isExpanded && (
         <div className="ml-2">
-          {item.children?.map((child: { id: string; title: string }) => (
-            <a
-              key={child.id}
-              href={`#${child.id}`}
-              className="block py-1 pl-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {child.title}
-            </a>
+          {item.children?.map((child) => (
+            <NavItem key={child.id} item={child} depth={depth + 1} />
           ))}
         </div>
       )}
@@ -87,8 +97,11 @@ function NavItem({
 
 export function Sidebar() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    "part-a": true,
     "part-0": true,
     "part-1": true,
+    "part-b": true,
+    "part-b-1": true,
   })
 
   const toggleSection = (id: string) => {
