@@ -1088,6 +1088,46 @@ export function MainContent() {
               <p className="text-sm text-muted-foreground text-center">Effect of varying σ on MNIST digits</p>
             </div>
           </div>
+
+          <div id="training-denoiser-1" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">1.2.1 Training</h3>
+            <p className="mb-4 text-muted-foreground">
+              In Part 1.2.1, I trained the UNet denoiser on MNIST using Gaussian noise with <span className="italic font-serif">σ = 0.5</span>. The model was optimized with mean-squared error loss to reconstruct clean digits from noisy inputs. I used batch size 256, learning rate 1e-4, hidden dimension 128, and trained for 5 epochs, recording training loss each iteration to monitor convergence.
+            </p>
+            <p className="mb-4 text-muted-foreground">
+              Below is the training loss curve over 5 epochs.
+            </p>
+            <div className="flex flex-col gap-2 mt-6 mb-8">
+              <img
+                src="outputs/Part_B/train_loss_plot_1_2_1.png"
+                alt="Training Loss Curve"
+                className="rounded-md w-full h-auto border border-border"
+              />
+              <p className="text-sm text-muted-foreground text-center">Training Loss Curve</p>
+            </div>
+
+            <p className="mb-4 text-muted-foreground">
+              After five epochs, denoised outputs are noticeably cleaner and closer to the original digits compared with the noisier epoch-1 reconstructions.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/epoch_1.png"
+                  alt="Epoch 1 Results"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Epoch 1 Results</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/epoch_5.png"
+                  alt="Epoch 5 Results"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Epoch 5 Results</p>
+              </div>
+            </div>
+          </div>
         </section>
       </section>
     </main>

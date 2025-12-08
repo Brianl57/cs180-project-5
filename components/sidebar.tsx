@@ -54,7 +54,11 @@ const navigation: NavSection[] = [
         title: "Part 1: Training a Single-Step Denoising UNet",
         children: [
           { id: "implementing-unet", title: "1.1 Implementing the UNet" },
-          { id: "training-denoiser", title: "1.2 Using the UNet to Train a Denoiser" },
+          {
+            id: "training-denoiser",
+            title: "1.2 Using the UNet to Train a Denoiser",
+            children: [{ id: "training-denoiser-1", title: "1.2.1 Training" }],
+          },
         ],
       },
     ],
@@ -102,6 +106,7 @@ export function Sidebar() {
     "part-1": true,
     "part-b": true,
     "part-b-1": true,
+    "training-denoiser": true,
   })
 
   const toggleSection = (id: string) => {
