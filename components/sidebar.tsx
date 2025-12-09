@@ -65,6 +65,18 @@ const navigation: NavSection[] = [
           },
         ],
       },
+      {
+        id: "part-b-2",
+        title: "Part 2: Training a Flow Matching Model",
+        children: [
+          { id: "time-conditioning", title: "2.1 Adding Time Conditioning to UNet" },
+          { id: "training-unet-flow", title: "2.2 Training the UNet" },
+          { id: "sampling-unet-flow", title: "2.3 Sampling from the UNet" },
+          { id: "class-conditioning", title: "2.4 Adding Class-Conditioning to UNet" },
+          { id: "training-class-cond", title: "2.5 Training the UNet" },
+          { id: "sampling-class-cond", title: "2.6 Sampling from the UNet" },
+        ],
+      },
     ],
   },
 ]
@@ -110,6 +122,7 @@ export function Sidebar() {
     "part-1": true,
     "part-b": true,
     "part-b-1": true,
+    "part-b-2": true,
     "training-denoiser": true,
   })
 

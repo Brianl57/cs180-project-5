@@ -1203,6 +1203,139 @@ export function MainContent() {
             </div>
           </div>
         </section>
+
+        {/* Part 2: Training a Flow Matching Model */}
+        <section id="part-b-2" className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Part 2: Training a Flow Matching Model</h2>
+
+          <div id="time-conditioning" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.1 Adding Time Conditioning to UNet</h3>
+            <p className="mb-4 text-muted-foreground">
+              In Part 2.1, I extended the basic UNet into a time-conditioned UNet. I implemented an FCBlock (Linear → GELU → Linear) that embeds the scalar timestep <span className="italic font-serif">t</span> into a feature vector. This time embedding is injected into intermediate decoder features at multiple resolutions, as shown in the red region of the architecture diagram, so the network can modulate its denoising behavior based on the current diffusion step rather than using a fixed, time-agnostic UNet.
+            </p>
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/cond_unet.png"
+                  alt="Time-Conditioned UNet Diagram"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Time-Conditioned UNet</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/FCBlock.png"
+                  alt="FCBlock Architecture"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">FCBlock Architecture</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="training-unet-flow" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.2 Training the UNet</h3>
+            <p className="mb-4 text-muted-foreground">
+              In Part 2.2, I trained the time-conditioned UNet on MNIST using the flow-matching objective. At each iteration I sampled a timestep <span className="italic font-serif">t</span>, formed an interpolated image <span className="italic font-serif">x_t = (1 - t)x_0 + tx_1</span>, and supervised the network to predict the target flow vector so it learns how to denoise across all times.
+            </p>
+            <div className="mb-4">
+              <p className="text-muted-foreground font-semibold mb-2">Hyperparameters:</p>
+              <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                <li>Batch size: 64</li>
+                <li>Hidden channels <span className="italic font-serif">D</span>: 64</li>
+                <li>Optimizer: Adam with initial learning rate <span className="italic font-serif">1 × 10<sup>-2</sup></span> and ExponentialLR scheduler <span className="italic font-serif">γ = 0.1<sup>1/num_epochs</sup></span>, stepped each epoch</li>
+                <li>Training length: 5 epochs</li>
+              </ul>
+            </div>
+            <p className="mb-6 text-muted-foreground">
+              I followed the “Training time-conditioned UNet” procedure described in Algorithm B.1, implementing each step of the loop in my training code.
+            </p>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2 mx-auto max-w-lg">
+                <img
+                  src="outputs/Part_B/training_alg_2_2.png"
+                  alt="Training Algorithm"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Training Algorithm</p>
+              </div>
+              <p className="text-muted-foreground mt-4 mb-2">
+                The plot below shows the time-conditioned UNet training flow matching loss over the course of training.
+              </p>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/tc_unet_train_loss.png"
+                  alt="Training Loss Curve"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Training Loss Curve</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="sampling-unet-flow" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.3 Sampling from the UNet</h3>
+            <p className="mb-4 text-muted-foreground">
+              In Part 2.3, I implemented the sampling algorithm for the time-conditioned UNet (Algorithm B.2), starting from pure Gaussian noise and iteratively updating <span className="italic font-serif">x<sub>t</sub></span> using the predicted flow <span className="italic font-serif">u<sub>θ</sub>(x<sub>t</sub>, t)</span> over <span className="italic font-serif">T</span> timesteps. I then generated unconditional MNIST samples using models saved after epochs 1, 5, and 10. The samples evolve from noisy, blob-like shapes at epoch 1 to increasingly sharp and realistic digits by epochs 5 and 10, showing clear improvement as training progresses.
+            </p>
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-2 mx-auto max-w-lg">
+                <img
+                  src="outputs/Part_B/part2_3_sampling_alg.png"
+                  alt="Sampling Algorithm"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Sampling Algorithm</p>
+              </div>
+
+              <p className="text-muted-foreground mt-4 mb-2">
+                Below are the unconditional samples generated at epochs 1, 5, and 10. As training progresses, the model transitions from generating noisy blobs to producing clear, recognizable MNIST digits, demonstrating the effectiveness of the flow matching objective.
+              </p>
+
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch1_2_3.png"
+                    alt="Samples Epoch 1"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 1</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch5_2_3.png"
+                    alt="Samples Epoch 5"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 5</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch10_2_3.png"
+                    alt="Samples Epoch 10"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 10</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="class-conditioning" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.4 Adding Class-Conditioning to UNet</h3>
+            <p className="text-muted-foreground">TODO: Add content for 2.4</p>
+          </div>
+
+          <div id="training-class-cond" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.5 Training the UNet</h3>
+            <p className="text-muted-foreground">TODO: Add content for 2.5</p>
+          </div>
+
+          <div id="sampling-class-cond" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">2.6 Sampling from the UNet</h3>
+            <p className="text-muted-foreground">TODO: Add content for 2.6</p>
+          </div>
+        </section>
       </section>
     </main>
   )
