@@ -57,7 +57,11 @@ const navigation: NavSection[] = [
           {
             id: "training-denoiser",
             title: "1.2 Using the UNet to Train a Denoiser",
-            children: [{ id: "training-denoiser-1", title: "1.2.1 Training" }],
+            children: [
+              { id: "training-denoiser-1", title: "1.2.1 Training" },
+              { id: "training-denoiser-2", title: "1.2.2 Out-of-Distribution Testing" },
+              { id: "training-denoiser-3", title: "1.2.3 Denoising Pure Noise" },
+            ],
           },
         ],
       },

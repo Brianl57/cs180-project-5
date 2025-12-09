@@ -1128,6 +1128,80 @@ export function MainContent() {
               </div>
             </div>
           </div>
+
+          <div id="training-denoiser-2" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">1.2.2 Out-of-Distribution Testing</h3>
+            <p className="mb-4 text-muted-foreground">
+              For Part 1.2.2, I evaluated the UNet’s robustness to out-of-distribution noise levels. Although the model was trained only with <span className="italic font-serif">σ = 0.5</span>, I tested it on digits 1, 2, and 7 corrupted with <span className="italic font-serif">σ ∈ {"{0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0}"}</span>. The reconstructions show that the network denoises unseen noise levels surprisingly well, especially near the training <span className="italic font-serif">σ</span>, with quality gradually degrading only at the highest noise levels (<span className="italic font-serif">σ = 0.8, 1.0</span>).
+            </p>
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/ood_1.png"
+                  alt="Out-of-Distribution Testing (Digit 1)"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">OOD Testing - Digit 1</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/ood_2.png"
+                  alt="Out-of-Distribution Testing (Digit 2)"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">OOD Testing - Digit 2</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/ood_7.png"
+                  alt="Out-of-Distribution Testing (Digit 7)"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">OOD Testing - Digit 7</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="training-denoiser-3" className="mb-10">
+            <h3 className="text-lg font-semibold mb-3">1.2.3 Denoising Pure Noise</h3>
+            <p className="mb-4 text-muted-foreground">
+              In Part 1.2.3, I probed how the trained UNet behaves on pure Gaussian noise inputs. I sampled random noise images (with <span className="italic font-serif">σ = 0.5</span>) that contained no underlying digit and passed them through the denoiser. The model still produced faint, digit-like strokes, showing that it has learned a strong prior over MNIST digits and tends to hallucinate plausible digit shapes even when no true signal is present.
+            </p>
+            <div className="flex flex-col gap-2 mt-6 mb-8">
+              <img
+                src="outputs/Part_B/pure_model_traini_loss_curve.png"
+                alt="Pure Model Training Loss Curve"
+                className="rounded-md w-full h-auto border border-border"
+              />
+              <p className="text-sm text-muted-foreground text-center">Pure Model Training Loss Curve</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/pure_model_samples_epoch1.png"
+                  alt="Pure Model Samples Epoch 1"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Pure Model Samples Epoch 1</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/pure_model_samples_epoch5.png"
+                  alt="Pure Model Samples Epoch 5"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Pure Model Samples Epoch 5</p>
+              </div>
+            </div>
+
+            <div className="mt-6 mb-2">
+              <h4 className="text-base font-semibold mb-2">Observed Patterns</h4>
+              <p className="text-muted-foreground">
+                When training on pure noise, the denoiser quickly stops relying on the input and instead learns to output almost the same blurry “average digit” for every sample. After the first epoch the shapes are already blob-like; by the fifth epoch they become a smoother, more consistent zero-ish template that looks similar across all noise seeds. With an MSE loss and inputs that contain no information about the true digit, the best strategy is to minimize the squared error to all training images at once, which pushes the network toward predicting the pixel-wise centroid (mean image) of the MNIST training set.
+              </p>
+            </div>
+          </div>
         </section>
       </section>
     </main>
