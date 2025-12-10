@@ -1323,17 +1323,148 @@ export function MainContent() {
 
           <div id="class-conditioning" className="mb-10">
             <h3 className="text-lg font-semibold mb-3">2.4 Adding Class-Conditioning to UNet</h3>
-            <p className="text-muted-foreground">TODO: Add content for 2.4</p>
+            <p className="mb-4 text-muted-foreground">
+              In Part 2.4, I extended the time-conditioned UNet to also be class-conditioned on the target MNIST digit label. I encoded each class label into a learned embedding and combined it with the time embedding, then injected this joint conditioning signal into the UNet via FCBlocks at multiple layers. This lets the model not only denoise over time but also steer the generation toward a specific digit class when sampling.
+            </p>
           </div>
 
           <div id="training-class-cond" className="mb-10">
             <h3 className="text-lg font-semibold mb-3">2.5 Training the UNet</h3>
-            <p className="text-muted-foreground">TODO: Add content for 2.5</p>
+            <p className="mb-4 text-muted-foreground">
+              For Part 2.5, I trained the class-conditioned UNet using the class-conditional flow-matching objective and Algorithm B.3. The training setup was:
+            </p>
+            <ul className="list-disc pl-6 space-y-1 text-muted-foreground mb-6">
+              <li>Batch size: 64</li>
+              <li>Hidden feature dimension: 64 channels</li>
+              <li>Number of time steps for sampling: 300</li>
+              <li>Training duration: 10 epochs</li>
+              <li>Learning rate: <span className="italic font-serif">1 × 10<sup>-2</sup></span> with Adam and exponential LR decay</li>
+              <li>Probability of dropping the class label for unconditional training: 0.1</li>
+            </ul>
+
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2 mx-auto max-w-lg">
+                <img
+                  src="outputs/Part_B/part_2_5_train_alg.png"
+                  alt="Training Algorithm"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Training Algorithm</p>
+              </div>
+
+              <p className="text-muted-foreground mt-4 mb-2">
+                Below is the class-conditioned UNet loss curve.
+              </p>
+
+              <div className="flex flex-col gap-2">
+                <img
+                  src="outputs/Part_B/class_cond_UNet_train_loss_curve.png"
+                  alt="Class-Conditioned UNet Training Loss Curve"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Class-Conditioned Training Loss</p>
+              </div>
+            </div>
           </div>
 
           <div id="sampling-class-cond" className="mb-10">
             <h3 className="text-lg font-semibold mb-3">2.6 Sampling from the UNet</h3>
-            <p className="text-muted-foreground">TODO: Add content for 2.6</p>
+            <p className="mb-4 text-muted-foreground">
+              For this part, I implemented the class-conditional sampling algorithm (Algorithm B.4): starting from Gaussian noise, I iteratively updated <span className="italic font-serif">x<sub>t</sub></span> by combining unconditional and class-conditioned flows with a guidance scale <span className="italic font-serif">γ</span> to steer samples toward the target digit label.
+            </p>
+
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-2 mx-auto max-w-lg">
+                <img
+                  src="outputs/Part_B/part_2_6_sampling_alg.png"
+                  alt="Sampling Algorithm"
+                  className="rounded-md w-full h-auto border border-border"
+                />
+                <p className="text-sm text-muted-foreground text-center">Sampling Algorithm</p>
+              </div>
+
+              <p className="text-muted-foreground mt-4 mb-2">
+                Using this sampler, I generated class-conditioned samples for digits 0–9 after epochs 1, 5, and 10. Early samples are noisy and only loosely resemble the target digits, while later epochs produce much sharper, cleaner, and more class-consistent MNIST digits, demonstrating the benefits of both longer training and classifier-free guidance.
+              </p>
+
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch1_2_6.png"
+                    alt="Samples Epoch 1"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 1</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch5_2_6.png"
+                    alt="Samples Epoch 5"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 5</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <img
+                    src="outputs/Part_B/samples_epoch10_2_6.png"
+                    alt="Samples Epoch 10"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Epoch 10</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <h4 className="text-base font-semibold mb-2">Removing the Scheduler</h4>
+              <p className="mb-4 text-muted-foreground">
+                To simplify the training setup, I removed the exponential learning rate scheduler and retrained the class-conditional UNet using only Adam with a fixed learning rate of <span className="italic font-serif">2 × 10<sup>-3</sup></span>. I kept all other hyperparameters (batch size, number of timesteps, epochs, and classifier-free guidance setup) the same. The higher fixed learning rate compensates for the lack of schedule by providing a similar effective step size early in training. The new training curve reaches a comparable final loss to the scheduler version, and samples after epochs 1, 5, and 10 show similar visual quality, indicating that the model maintains performance without the scheduler.
+              </p>
+
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <p className="text-muted-foreground mb-1">
+                    Training loss curve with fixed learning rate (no scheduler).
+                  </p>
+                  <img
+                    src="outputs/Part_B/train_loss_curve_no_scheduler.png"
+                    alt="Training Loss Curve No Scheduler"
+                    className="rounded-md w-full h-auto border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground text-center">Training Loss (No Scheduler)</p>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  <p className="text-muted-foreground mb-1">
+                    Samples generated at epochs 1, 5, and 10 without using a learning rate scheduler.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <img
+                      src="outputs/Part_B/samples_no_scheduler_epoch1.png"
+                      alt="Samples Epoch 1 No Scheduler"
+                      className="rounded-md w-full h-auto border border-border"
+                    />
+                    <p className="text-sm text-muted-foreground text-center">Epoch 1 (No Scheduler)</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <img
+                      src="outputs/Part_B/samples_no_scheduler_epoch5.png"
+                      alt="Samples Epoch 5 No Scheduler"
+                      className="rounded-md w-full h-auto border border-border"
+                    />
+                    <p className="text-sm text-muted-foreground text-center">Epoch 5 (No Scheduler)</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <img
+                      src="outputs/Part_B/samples_no_scheduler_epoch10.png"
+                      alt="Samples Epoch 10 No Scheduler"
+                      className="rounded-md w-full h-auto border border-border"
+                    />
+                    <p className="text-sm text-muted-foreground text-center">Epoch 10 (No Scheduler)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </section>
