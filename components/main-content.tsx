@@ -154,23 +154,9 @@ export function MainContent() {
           <div id="forward-process" className="mb-10">
             <h3 className="text-lg font-semibold mb-3">1.1 Forward Process</h3>
             <p className="mb-4 text-muted-foreground">
-              I implemented the forward process function to add Gaussian noise to an image at a specific timestep t.
+              I implemented the forward process function to add Gaussian noise to an image at a specific timestep t. Below are the results at timesteps 250, 500, and 750. 
             </p>
-            <div className="bg-muted p-4 rounded-md overflow-x-auto mb-4">
-              <pre className="text-sm font-mono">
-                {`def forward(im, t):
-  with torch.no_grad():
-    alpha_bar = alphas_cumprod[t].to(device=im.device, dtype=im.dtype)
 
-    sqrt_alpha_bar = torch.sqrt(alpha_bar).reshape(1, 1, 1, 1)
-    sqrt_one_minus_alpha_bar = torch.sqrt(1 - alpha_bar).reshape(1, 1, 1, 1)
-
-    eps = torch.randn_like(im)
-    im_noisy = sqrt_alpha_bar * im + sqrt_one_minus_alpha_bar * eps
-
-  return im_noisy`}
-              </pre>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
               <div className="flex flex-col gap-2">
                 <img
